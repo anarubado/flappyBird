@@ -24,6 +24,7 @@ var bird = {
 }
 
 var frames = 0;
+var isGameOver = false;
 
 // Funciones por cuadro
 function drawBg() {
@@ -58,6 +59,19 @@ function updateBirdSprite() {
     return bird.src;
 }
 
+function updateBirdPosition() {
+    if (bird.flyingTime > 0) { // El tiempo de vuelo disminuirá
+        bird.flyingTime--;
+        bird.y -= 5; // Pajarito vuela hacia arriba
+    } else {
+        bird.y += GAME.GRAVITY; // Incrementamos la variable "y" según la gravedad que usemos en el juego. Cuanto más grande sea la gravedad, más rápido bajará el pajarito    
+    } // Si no presionamos la tecla y hacemos volar al pajarito, éste caerá debido a la gravedad
+
+    if (bird.rotation < 90) {
+        bird.rotation += 10;
+    }
+}
+
 function drawBird() {
     var sprite = new Image();
 
@@ -66,23 +80,15 @@ function drawBird() {
     }
 
     if (frames > GAME.INITIAL_DELAY) { // El pajarito volará un tiempo y luego quedarán sus movimientos en nuestra responsabilidad 
-        if (bird.flyingTime > 0) { // El tiempo de vuelo disminuirá
-            bird.flyingTime--;
-            bird.y -= 5; // Pajarito vuela hacia arriba
-        } else {
-            bird.y += GAME.GRAVITY; // Incrementamos la variable "y" según la gravedad que usemos en el juego. Cuanto más grande sea la gravedad, más rápido bajará el pajarito    
-        } // Si no presionamos la tecla y hacemos volar al pajarito, éste caerá debido a la gravedad
-    
-        if (bird.rotation < 90) {
-            bird.rotation += 10;
-        }
-
-    }
-
-    
+        updateBirdPosition();
+    }    
     
     sprite.src = bird.src; // Le asignamos a la variable sprite, la imagen a renderizar que convenga para que el pajarito aletee
     
+    if (bird.y + sprite.height > GAME.HEIGHT - 112) { // Cuando el pajarito caiga al suelo, es game over
+        isGameOver = true;
+    }
+
     ctx.save();
     ctx.translate(50 + sprite.width / 2, bird.y + sprite.height / 2); // Colocamos el punto de rotación en el medio del pajarito
 
@@ -99,6 +105,12 @@ function fly() {
   
 }
 
+function drawGameOver() {
+    var gameOver = new Image()
+    gameOver.src = "assets/sprites/gameover.png"; // Imagen a renderizar
+    ctx.drawImage(gameOver, (GAME.WIDTH - gameOver.width) / 2, (GAME.HEIGHT - gameOver.height) / 2); // Dibuja la imagen en una posicion determinada
+}
+
 function draw() {
     drawBg();
     drawFloor();
@@ -107,9 +119,14 @@ function draw() {
 
 // Game Loop - Bucle principal
 function run() {
-    frames++ // Seteamos una variable llamada frames (cuadros) que se va a ir incrementando según el número de cuadros que se ejecuten
-    draw();
-    window.requestAnimationFrame(run); // Función recursiva para ejecutar lo que necesitemos (varios cuadros por segundo)
+    if (!isGameOver) {
+        frames++ // Seteamos una variable llamada frames (cuadros) que se va a ir incrementando según el número de cuadros que se ejecuten
+        draw();
+        window.requestAnimationFrame(run); // Función recursiva para ejecutar lo que necesitemos (varios cuadros por segundo)
+    } else {
+        drawGameOver();
+        window.requestAnimationFrame(run); // Función recursiva para ejecutar lo que necesitemos (varios cuadros por segundo)
+    }
 }
 
 window.requestAnimationFrame(run);
