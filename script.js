@@ -23,6 +23,14 @@ var bird = {
     rotation: 0
 }
 
+var pipes = [
+    {x: 100}, 
+    {x: 250}, 
+    {x: 350},
+    {x: 450}, 
+    {x: 600}
+]
+
 var frames = 0;
 var isGameOver = false;
 
@@ -31,6 +39,16 @@ function drawBg() {
     var bg = new Image()
     bg.src = "assets/sprites/background-day.png"; // Imagen a renderizar
     ctx.drawImage(bg, 0, 0); // Dibuja la imagen en una posicion determinada
+}
+
+function drawPipes() {
+    var pipe = new Image()
+    pipe.src = "assets/sprites/pipe-green.png";
+
+    for (var i = 0; i < pipes.length; i++) {
+        ctx.drawImage(pipe, pipes[i].x, GAME.HEIGHT - pipe.height - 112);
+        pipes[i].x--;
+    }    
 }
 
 function drawFloor() {
@@ -101,20 +119,20 @@ function fly() {
     if (frames > GAME.INITIAL_DELAY) {
         bird.flyingTime = 10; // Cada vez que se toque la tecla, el pajarito tendrá cierto "impulso" y volará un determinado tiempo
         bird.rotation = -20;
-    }
-  
+    }  
 }
 
 function drawGameOver() {
-    var gameOver = new Image()
-    gameOver.src = "assets/sprites/gameover.png"; // Imagen a renderizar
-    ctx.drawImage(gameOver, (GAME.WIDTH - gameOver.width) / 2, (GAME.HEIGHT - gameOver.height) / 2); // Dibuja la imagen en una posicion determinada
-}
+    var gameOver = new Image();    
+    gameOver.src = "assets/sprites/gameover.png";
+    ctx.drawImage(gameOver, (GAME.WIDTH - gameOver.width) / 2, (GAME.HEIGHT - gameOver.height) / 2);
+}    
 
 function draw() {
-    drawBg();
+    drawBg();    
+    drawPipes();
     drawFloor();
-    drawBird();
+    drawBird();    
 }
 
 // Game Loop - Bucle principal
