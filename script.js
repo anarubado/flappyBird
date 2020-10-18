@@ -132,7 +132,7 @@ function draw() {
     drawBg();    
     drawPipes();
     drawFloor();
-    drawBird();    
+    drawBird();
 }
 
 // Game Loop - Bucle principal
