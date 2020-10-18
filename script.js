@@ -11,24 +11,28 @@ var GAME = {
     WIDTH: 288,
     HEIGHT: 624,
     GRAVITY: 6,
-    INITIAL_DELAY: 200
+    INITIAL_DELAY: 0
 }
 
 var floorX = 0;
 
+var pipe = new Image();
+
 var bird = {
+    sprite: new Image(),
     src: "assets/sprites/yellowbird-midflap.png", // Iniciamos el dibujo del pajarito con las alas en el medio
+    x: 50,
     y: 200,
     flyingTime: 0,
     rotation: 0
 }
 
 var pipes = [
-    {x: 100}, 
-    {x: 250}, 
-    {x: 350},
-    {x: 450}, 
-    {x: 600}
+    {x: 200}, 
+    {x: 350}, 
+    {x: 500},
+    {x: 650}, 
+    {x: 800}
 ]
 
 var frames = 0;
@@ -42,13 +46,20 @@ function drawBg() {
 }
 
 function drawPipes() {
-    var pipe = new Image()
     pipe.src = "assets/sprites/pipe-green.png";
 
     for (var i = 0; i < pipes.length; i++) {
         ctx.drawImage(pipe, pipes[i].x, GAME.HEIGHT - pipe.height - 112);
         pipes[i].x--;
-    }    
+    }
+    
+    if (pipes[pipes.length - 1].x < GAME.WIDTH) { // Si la última tubería del array "está pasando"
+        pipes.push({x: GAME.WIDTH + 150}) // Agregamos otra tubería en el array atrás de ésta (dejamos un poco de espacio entre ellas)
+    }
+
+    if (pipes[0].x < -pipe.width) { // Si la primera tubería del array "se fué"
+        pipes.shift(); // La eliminamos del array
+    }
 }
 
 function drawFloor() {
@@ -91,7 +102,6 @@ function updateBirdPosition() {
 }
 
 function drawBird() {
-    var sprite = new Image();
 
     if (frames % 4 === 0) { // Cada 4 cuadros que pasen, actualizaremos la imagen del pajarito (esto es para ralentizarlo)
         updateBirdSprite(); // Retorna la imagen a renderizar
@@ -101,17 +111,17 @@ function drawBird() {
         updateBirdPosition();
     }    
     
-    sprite.src = bird.src; // Le asignamos a la variable sprite, la imagen a renderizar que convenga para que el pajarito aletee
+    bird.sprite.src = bird.src; // Le asignamos a la variable sprite, la imagen a renderizar que convenga para que el pajarito aletee
     
-    if (bird.y + sprite.height > GAME.HEIGHT - 112) { // Cuando el pajarito caiga al suelo, es game over
+    if (bird.y + bird.sprite.height > GAME.HEIGHT - 112) { // Cuando el pajarito caiga al suelo, es game over
         isGameOver = true;
     }
 
     ctx.save();
-    ctx.translate(50 + sprite.width / 2, bird.y + sprite.height / 2); // Colocamos el punto de rotación en el medio del pajarito
+    ctx.translate(bird.x + bird.sprite.width / 2, bird.y + bird.sprite.height / 2); // Colocamos el punto de rotación en el medio del pajarito
 
     ctx.rotate(Math.PI / 180 * bird.rotation);
-    ctx.drawImage(sprite, -sprite.width / 2, -sprite.height / 2);
+    ctx.drawImage(bird.sprite, -bird.sprite.width / 2, -bird.sprite.height / 2);
     ctx.restore();
 }
 
@@ -120,6 +130,17 @@ function fly() {
         bird.flyingTime = 10; // Cada vez que se toque la tecla, el pajarito tendrá cierto "impulso" y volará un determinado tiempo
         bird.rotation = -20;
     }  
+}
+
+function checkCoalitions() {
+    var pipe0 = pipes[0];
+    if (
+        bird.x + bird.sprite.width > pipe0.x && 
+        bird.x  + bird.sprite.width < pipe0.x + pipe.width &&
+        bird.y > GAME.HEIGHT - pipe.height - 112
+        ) {
+            isGameOver = true;        
+        }
 }
 
 function drawGameOver() {
@@ -135,13 +156,16 @@ function draw() {
     drawBird();
 }
 
+
 // Game Loop - Bucle principal
 function run() {
+    
     if (isGameOver) {
         drawGameOver();
     } else {
         frames++ // Seteamos una variable llamada frames (cuadros) que se va a ir incrementando según el número de cuadros que se ejecuten
         draw();
+        checkColitions();
     }
     window.requestAnimationFrame(run); // Función recursiva para ejecutar lo que necesitemos (varios cuadros por segundo)
 }
