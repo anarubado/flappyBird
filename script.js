@@ -16,7 +16,7 @@ var GAME = {
 
 var floorX = 0;
 
-var pipe = new Image();
+var pipeSprite = new Image();
 
 var bird = {
     sprite: new Image(),
@@ -45,21 +45,30 @@ function drawBg() {
     ctx.drawImage(bg, 0, 0); // Dibuja la imagen en una posicion determinada
 }
 
-function drawPipes() {
-    pipe.src = "assets/sprites/pipe-green.png";
-
-    for (var i = 0; i < pipes.length; i++) {
-        ctx.drawImage(pipe, pipes[i].x, GAME.HEIGHT - pipe.height - 112);
-        pipes[i].x--;
-    }
-    
+function addPipes() {
     if (pipes[pipes.length - 1].x < GAME.WIDTH) { // Si la última tubería del array "está pasando"
         pipes.push({x: GAME.WIDTH + 150}) // Agregamos otra tubería en el array atrás de ésta (dejamos un poco de espacio entre ellas)
     }
+}
 
-    if (pipes[0].x < -pipe.width) { // Si la primera tubería del array "se fué"
+function deletePipes() {
+    if (pipes[0].x < -pipeSprite.width) { // Si la primera tubería del array "se fué"
         pipes.shift(); // La eliminamos del array
     }
+
+}
+
+function drawPipes() {
+    pipeSprite.src = "assets/sprites/pipe-green.png";
+
+    for (var i = 0; i < pipes.length; i++) {
+        ctx.drawImage(pipeSprite, pipes[i].x, GAME.HEIGHT - pipeSprite.height - 112);
+        pipes[i].x--;
+    }
+
+    addPipes();
+
+    deletePipes();
 }
 
 function drawFloor() {
@@ -133,14 +142,18 @@ function fly() {
 }
 
 function checkCoalitions() {
-    var pipe0 = pipes[0];
-    if (
-        bird.x + bird.sprite.width > pipe0.x && 
-        bird.x  + bird.sprite.width < pipe0.x + pipe.width &&
-        bird.y > GAME.HEIGHT - pipe.height - 112
-        ) {
-            isGameOver = true;        
-        }
+    for (var i = 0; i < pipes.length; i++) {
+        var pipe = pipes[i];
+        if (
+            bird.x + bird.sprite.width > pipe.x && 
+            bird.x < pipe.x + pipeSprite.width &&
+            bird.y > GAME.HEIGHT - pipeSprite.height - 112
+            ) {
+                isGameOver = true;        
+            }
+        
+    }   
+    
 }
 
 function drawGameOver() {
@@ -165,7 +178,7 @@ function run() {
     } else {
         frames++ // Seteamos una variable llamada frames (cuadros) que se va a ir incrementando según el número de cuadros que se ejecuten
         draw();
-        checkColitions();
+        checkCoalitions();
     }
     window.requestAnimationFrame(run); // Función recursiva para ejecutar lo que necesitemos (varios cuadros por segundo)
 }
