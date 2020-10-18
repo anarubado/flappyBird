@@ -137,14 +137,13 @@ function draw() {
 
 // Game Loop - Bucle principal
 function run() {
-    if (!isGameOver) {
+    if (isGameOver) {
+        drawGameOver();
+    } else {
         frames++ // Seteamos una variable llamada frames (cuadros) que se va a ir incrementando según el número de cuadros que se ejecuten
         draw();
-        window.requestAnimationFrame(run); // Función recursiva para ejecutar lo que necesitemos (varios cuadros por segundo)
-    } else {
-        drawGameOver();
-        window.requestAnimationFrame(run); // Función recursiva para ejecutar lo que necesitemos (varios cuadros por segundo)
     }
+    window.requestAnimationFrame(run); // Función recursiva para ejecutar lo que necesitemos (varios cuadros por segundo)
 }
 
 window.requestAnimationFrame(run);
