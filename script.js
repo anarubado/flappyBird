@@ -85,6 +85,12 @@ function drawFloor() {
     ctx.drawImage(floor, floorX + floor.width, 512); // Dibujamos una segunda imagen del suelo "justo detrás de la anterior"
 }
 
+function drawStaticFloor() {
+    var floor = new Image()
+    floor.src = "assets/sprites/base.png";
+    ctx.drawImage(floor, 0, 512);
+}
+
 function updateBirdSprite() {
     if (bird.src === "assets/sprites/yellowbird-midflap.png") {
         bird.src = "assets/sprites/yellowbird-downflap.png";
@@ -163,24 +169,51 @@ function drawGameOver() {
 }    
 
 function draw() {
-    drawBg();    
-    drawPipes();
-    drawFloor();
-    drawBird();
+    if (frames > 360) {
+        drawBg();    
+        drawPipes();
+        drawFloor();
+        drawBird();
+    }    
+}
+
+var number = new Image();
+
+function countdown() {
+    if (frames === 1) {
+        number.src = "assets/sprites/5.png";
+    } else if (frames === 60) {
+        number.src = "assets/sprites/4.png";
+    } else if (frames === 120) {
+        number.src = "assets/sprites/3.png";
+    } else if (frames === 180) {
+        number.src = "assets/sprites/2.png";
+    } else if (frames === 240) {
+        number.src = "assets/sprites/1.png";
+    } else if (frames === 300) {
+        number.src = "assets/sprites/0.png";
+    } else {
+        number.remove();
+    }    
+    
+    drawBg();
+    drawStaticFloor();
+
+    ctx.drawImage(number, (GAME.WIDTH - number.width) / 2, (GAME.HEIGHT - number.height) / 2);    
 }
 
 
 // Game Loop - Bucle principal
-function run() {
-    
+function run() {    
     if (isGameOver) {
         drawGameOver();
     } else {
-        frames++ // Seteamos una variable llamada frames (cuadros) que se va a ir incrementando según el número de cuadros que se ejecuten
-        draw();
-        checkCoalitions();
+        frames++ // Seteamos una variable llamada frames (cuadros) que se va a ir incrementando según el número de cuadros que se ejecuten      
+        countdown();
+        draw();        
+        checkCoalitions();   
     }
-    window.requestAnimationFrame(run); // Función recursiva para ejecutar lo que necesitemos (varios cuadros por segundo)
+    window.requestAnimationFrame(run); // Función recursiva para ejecutar lo que necesitemos (varios cuadros por segundo)    
 }
 
 window.requestAnimationFrame(run);
